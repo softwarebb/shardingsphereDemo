@@ -1,0 +1,44 @@
+spring:
+  shardingsphere:
+    datasource:
+      names: ds0
+      ds0:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/tmy
+        username: root
+        password: 123456
+    encrypt:
+      encryptors:
+        name_encryptor:
+          qualifiedColumns: tb_user.user_name
+          type: aes
+          props:
+            aes:
+              key:
+                value: 123456
+        pwd_encryptor:
+          qualifiedColumns: tb_user.pwd
+          type: md5
+      tables:
+        tb_user:
+          columns:
+            user_name:
+              plain-column: user_name_plain
+              cipher-column: user_name_cipher
+              encryptor: name_encryptor
+            pwd:
+              plain-column: pwd_plain
+              cipher-column: pwd_cipher
+              # 可以用明文查到加密数据
+              assisted-query-column: assisted_query_pwd
+              encryptor: pwd_encryptor
+
+    props:
+      query:
+        with:
+          cipher:
+            column: true
+      sql:
+        show: true
+
