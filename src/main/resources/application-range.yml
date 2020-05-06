@@ -1,0 +1,41 @@
+spring:
+  shardingsphere:
+    datasource:
+      names: ds0,ds1
+      ds0:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/tmy
+        username: root
+        password: 123456
+      ds1:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/tmy1
+        username: root
+        password: 123456
+    sharding:
+      default-database-strategy:
+#        standard:
+#          sharding-column: order_no
+#          range-algorithm-class-name: com.example.demo.customalgorithm.OrderRangeShardingAlgorithm
+#        inline:
+#          sharding-column: order_no
+#          algorithm-expression: ds$->{order_no%2}
+      tables:
+        tb_order:
+          actual-data-nodes: ds$->{0..1}.tb_order_$->{0..1}
+          table-strategy:
+            inline:
+              sharding-column: order_no
+              algorithm-expression: tb_order_$->{order_no % 2}
+        tb_order_item:
+          actual-data-nodes: ds$->{0..1}.tb_order_item_$->{0..1}
+          table-strategy:
+            inline:
+              sharding-column: order_no
+              algorithm-expression: tb_order_item_$->{order_no % 2}
+
+    props:
+      sql:
+        show: true
